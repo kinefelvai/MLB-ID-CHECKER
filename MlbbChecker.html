@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ramim vai noob MLBB ID Checker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 40px;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      margin: 8px;
+      border-radius: 6px;
+      border: none;
+      width: 260px;
+    }
+    button {
+      background-color: #00bcd4;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0097a7;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 17px;
+      color: #4caf50;
+      text-align: center;
+      max-width: 90%;
+    }
+  </style>
+</head>
+<body>
+  <h2>Ramim vai noob MLBB ID Checker</h2>
+  <input type="text" id="userId" placeholder="Enter User ID" />
+  <input type="text" id="serverId" placeholder="Enter Server ID" />
+  <button onclick="checkMLBB()">Check</button>
+  <div id="result"></div>
+
+  <script>
+    function checkMLBB() {
+      const userId = document.getElementById("userId").value.trim();
+      const serverId = document.getElementById("serverId").value.trim();
+      const resultBox = document.getElementById("result");
+
+      if (!userId || !serverId) {
+        resultBox.innerHTML = "❗ Please enter both User ID and Server ID.";
+        return;
+      }
+
+      resultBox.innerHTML = "⏳ Checking...";
+
+      fetch(`https://id-game-checker.p.rapidapi.com/mobile-legends/${userId}/${serverId}`, {
+        method: "GET",
+        headers: {
+          "x-rapidapi-key": "e9e84a01abmshc215d067e9c3e46p189978jsn047cd833d80b",
+          "x-rapidapi-host": "id-game-checker.p.rapidapi.com"
+        }
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.data && data.data.username) {
+            const shopOffer = data.data.shop_events?.[0]?.title || "Not Found";
+            resultBox.innerHTML = `
+              ✅ <strong>Name:</strong> ${data.data.username} <br/>
+              🆔 <strong>ID:</strong> ${data.data.id} <br/>
+              🗂️ <strong>Server:</strong> ${data.data.server} <br/>
+              🌍 <strong>Region:</strong> ${data.data.region || "Unknown"} <br/>
+              🛒 <strong>Shop Event:</strong> ${shopOffer}
+            `;
+          } else if (data && data.message) {
+            resultBox.innerHTML = `❌ ${data.message}`;
+          } else {
+            resultBox.innerHTML = "❌ Invalid ID or no data found.";
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          resultBox.innerHTML = "❌ Error fetching data.";
+        });
+    }
+  </script>
+</body>
+</html>
